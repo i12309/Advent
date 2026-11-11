@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132c39">
+  <meta name="description" content="Advent — живая открытка, которая считает мгновения до праздников. Тринадцать маленьких миров, смена сезонов и по одному тёплому сюрпризу каждый день.">
+  <title>Advent — у каждого дня есть предвкушение</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="./assets/fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body data-theme="winter">
+  <a href="#main" class="skip-link">К открытке</a>
+  <div class="world" id="world" aria-hidden="true">
+    <div class="sky-glow"></div>
+    <div class="art-layer" id="art-layer"></div>
+    <div class="scene-shade"></div>
+    <canvas id="atmosphere"></canvas>
+    <div class="paper-grain"></div>
+  </div>
+
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Advent — к сегодняшней открытке" id="brand-home">
+        <span class="brand-symbol" data-icon="brand" aria-hidden="true"></span>
+        <span class="brand-word">advent<span class="brand-dot">.</span></span>
+        <span class="brand-note">искусство<br>предвкушения</span>
+      </a>
+      <nav class="header-actions" aria-label="Управление календарём">
+        <button class="collection-button" id="open-gallery"><span data-icon="grid" aria-hidden="true"></span><span>Все события</span><span class="event-count">13</span></button>
+        <span class="header-divider" aria-hidden="true"></span>
+        <button class="icon-button" id="pause-motion" aria-label="Приостановить анимацию" title="Приостановить анимацию" aria-pressed="false"><span data-icon="pause" aria-hidden="true"></span></button>
+        <button class="icon-button" id="fullscreen" aria-label="На весь экран" title="На весь экран"><span data-icon="expand" aria-hidden="true"></span></button>
+        <button class="icon-button" id="open-settings" aria-label="Настройки" title="Настройки"><span data-icon="settings" aria-hidden="true"></span></button>
+      </nav>
+    </header>
+
+    <div class="preview-bar" id="preview-bar" hidden>
+      <span class="preview-label"><span class="status-dot"></span>Просмотр открытки</span>
+      <div class="preview-modes" role="group" aria-label="Режим просмотра">
+        <button data-preview-mode="countdown" aria-pressed="true">Ожидание</button>
+        <button data-preview-mode="celebration" aria-pressed="false">Праздник</button>
+      </div>
+      <button class="preview-return" id="return-today">К сегодняшнему дню <span data-icon="close" aria-hidden="true"></span></button>
+    </div>
+
+    <main id="main" class="main" tabindex="-1">
+      <section class="postcard-copy" aria-labelledby="event-heading">
+        <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span><span id="event-eyebrow">СЛЕДУЮЩАЯ ГЛАВА</span><span class="eyebrow-dot" aria-hidden="true">·</span><time id="event-date">1 декабря</time></p>
+        <h1 id="event-heading">Скоро<br><em>зима.</em></h1>
+        <p class="event-description" id="event-description">Мир укроется тишиной, в окнах зажжётся свет.<br>И у каждого дня появится немного волшебства.</p>
+        <p class="coinciding-event" id="coinciding-event" hidden></p>
+
+        <div class="countdown-area" id="countdown-area">
+          <p class="countdown-caption" id="countdown-caption">ДО НАЧАЛА ЗИМЫ ОСТАЛОСЬ</p>
+          <div class="countdown" id="countdown" role="timer" aria-live="off">
+            <div class="countdown-unit"><span class="countdown-number" id="count-days">—</span><span class="countdown-label" id="label-days">дней</span></div>
+            <span class="countdown-colon" aria-hidden="true">:</span>
+            <div class="countdown-unit"><span class="countdown-number" id="count-hours">—</span><span class="countdown-label" id="label-hours">часов</span></div>
+            <span class="countdown-colon" aria-hidden="true">:</span>
+            <div class="countdown-unit"><span class="countdown-number" id="count-minutes">—</span><span class="countdown-label" id="label-minutes">минут</span></div>
+            <span class="countdown-colon" aria-hidden="true">:</span>
+            <div class="countdown-unit"><span class="countdown-number" id="count-seconds">—</span><span class="countdown-label" id="label-seconds">секунд</span></div>
+          </div>
+        </div>
+        <div class="celebration-message" id="celebration-message" hidden>
+          <span data-icon="sparkles" aria-hidden="true"></span><div><strong>Этот день настал.</strong><p id="celebration-note">Пусть в нём случится что-нибудь прекрасное.</p></div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="scene-action" id="scene-action"><span data-icon="sparkles" aria-hidden="true"></span><span id="scene-action-label">Зажечь огни</span><span class="action-arrow" aria-hidden="true">↗</span></button>
+          <span class="interaction-note" id="interaction-note">добавьте немного волшебства</span>
+        </div>
+      </section>
+
+      <aside class="postage-stamp" aria-label="Дата события">
+        <div class="stamp-inner"><span class="stamp-icon" id="stamp-icon" data-icon="snowflake" aria-hidden="true"></span><span class="stamp-day" id="stamp-day">01</span><span class="stamp-month" id="stamp-month">ДЕКАБРЯ</span><span class="stamp-year" id="stamp-year">2026</span></div>
+        <svg class="postmark" width="84" height="44" viewBox="0 0 84 44" aria-hidden="true"><path d="M2 10 Q15 1 28 10 T54 10 T80 10 M2 22 Q15 13 28 22 T54 22 T80 22 M2 34 Q15 25 28 34 T54 34 T80 34" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      </aside>
+
+      <div class="scene-note"><span class="scene-note-line" aria-hidden="true"></span><div><p id="scene-chapter">ОТКРЫТКА № 12</p><span id="scene-caption">Там, где ждут первый снег</span></div></div>
+      <div class="scene-navigation" aria-label="Листать открытки">
+        <button class="round-button" id="previous-scene" aria-label="Предыдущая открытка"><span data-icon="arrow-left" aria-hidden="true"></span></button>
+        <span id="scene-index">12 <span>/ 13</span></span>
+        <button class="round-button" id="next-scene" aria-label="Следующая открытка"><span data-icon="arrow-right" aria-hidden="true"></span></button>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="advent-row">
+        <button class="advent-intro" id="open-advent"><span class="overline">МАЛЕНЬКИЕ РАДОСТИ</span><span class="advent-title">По окошку в день <span aria-hidden="true">↗</span></span><span class="advent-hint">Сегодня внутри что-то тёплое</span></button>
+        <div class="advent-strip" id="advent-strip" aria-label="Ежедневные окошки адвента"></div>
+        <button class="next-event" id="next-event"><span class="next-event-icon" id="next-event-icon" aria-hidden="true"></span><span class="next-event-copy"><span class="overline">А СЛЕДОМ</span><strong id="next-event-title">День рождения автора</strong><span id="next-event-date">26 декабря</span></span><span class="next-event-arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <div class="footer-meta"><span class="footer-quote">Пусть ожидание тоже будет праздником.</span><button id="timezone-button" class="timezone-button"><span class="status-dot" aria-hidden="true"></span><span id="clock-label">МОСКВА · АВТОМАТИЧЕСКАЯ СМЕНА ОТКРЫТОК</span></button></div>
+    </footer>
+  </div>
+
+  <dialog id="gallery-dialog" class="dialog gallery-dialog" aria-labelledby="gallery-title">
+    <div class="dialog-header"><div><p class="overline">КОЛЛЕКЦИЯ ВПЕЧАТЛЕНИЙ</p><h2 id="gallery-title">У каждого события<br><em>свой маленький мир.</em></h2></div><button class="icon-button dialog-close" aria-label="Закрыть коллекцию" data-close><span data-icon="close" aria-hidden="true"></span></button></div>
+    <p class="dialog-description">13 открыток на целый год. Выберите любую, чтобы заглянуть в будущее. Настоящий календарь продолжит идти своим чередом.</p>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <p class="gallery-footnote"><span data-icon="layers" aria-hidden="true"></span>1 сентября — два повода: День знаний и начало осени.</p>
+  </dialog>
+
+  <dialog id="settings-dialog" class="dialog settings-dialog" aria-labelledby="settings-title">
+    <div class="dialog-header"><div><p class="overline">ВАШ РИТМ</p><h2 id="settings-title">Немного настроек</h2></div><button class="icon-button dialog-close" aria-label="Закрыть настройки" data-close><span data-icon="close" aria-hidden="true"></span></button></div>
+    <label class="setting-row setting-select"><span><strong>Часовой пояс</strong><small>В полночь по этому времени начинается праздник.</small></span><select id="timezone-select"><option value="Europe/Moscow">Москва · UTC+3</option><option value="local">Часовой пояс устройства</option></select></label>
+    <label class="setting-row"><span><strong>Живая открытка</strong><small>Движение снега, листьев, огней и деталей пейзажа.</small></span><input type="checkbox" id="motion-toggle" class="switch" checked></label>
+    <p class="motion-system-note" id="motion-system-note" hidden>В системе включено уменьшение движения. Открытка остаётся статичной — это предпочтение имеет приоритет.</p>
+    <div class="settings-note"><span data-icon="clock" aria-hidden="true"></span><div><strong>Праздник длится весь день</strong><p>Отсчёт заканчивается в 00:00. Весь день открытка празднует вместе с вами, а в следующую полночь начинается новая история.</p></div></div>
+    <div class="settings-note"><span data-icon="gift" aria-hidden="true"></span><div><strong>Сюрприз для каждого дня</strong><p>Прошедшие окошки можно открыть снова. Будущие откроются в свою дату. Ваши открытые окошки сохраняются в этом браузере.</p></div></div>
+    <div class="settings-note"><span data-icon="heart" aria-hidden="true"></span><div><strong>Один особенный день</strong><p>26 декабря — день рождения автора календаря. Для него здесь приготовлена отдельная открытка.</p></div></div>
+  </dialog>
+
+  <dialog id="advent-dialog" class="dialog advent-dialog" aria-labelledby="advent-title">
+    <div class="dialog-header"><div><p class="overline">ХОРОШЕЕ ПОНЕМНОГУ</p><h2 id="advent-title">Маленькие радости</h2></div><button class="icon-button dialog-close" aria-label="Закрыть окошки" data-close><span data-icon="close" aria-hidden="true"></span></button></div>
+    <p class="dialog-description" id="advent-description">Каждый день — новое окошко. Будущие сюрпризы немного подождут.</p>
+    <div class="advent-grid" id="advent-grid"></div>
+    <p class="advent-legend"><span><i class="legend-today"></i>сегодня</span><span><i class="legend-open"></i>уже открыто</span><span><span data-icon="lock" aria-hidden="true"></span>ещё впереди</span></p>
+  </dialog>
+
+  <dialog id="letter-dialog" class="dialog letter-dialog" aria-labelledby="letter-title">
+    <button class="icon-button dialog-close" aria-label="Закрыть сюрприз" data-close><span data-icon="close" aria-hidden="true"></span></button>
+    <div class="letter-icon" id="letter-icon" aria-hidden="true"></div>
+    <p class="overline" id="letter-date"></p>
+    <h2 id="letter-title">Маленькое чудо дня</h2>
+    <p class="letter-text" id="letter-text"></p>
+    <div class="letter-ornament" aria-hidden="true">✧</div>
+    <p class="letter-signature">С теплом, ваш Advent</p>
+    <button class="letter-action" id="letter-action">Вернуться к открытке <span aria-hidden="true">↗</span></button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="event-announcement" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript">Эта открытка оживает с JavaScript. Включите его в браузере — появятся отсчёт до праздника и ежедневные сюрпризы.</div></noscript>
+</body>
+</html>

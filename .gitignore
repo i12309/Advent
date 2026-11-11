@@ -1,0 +1,12 @@
+node_modules/
+.openai/
+.cache/
+.DS_Store
+.env
+.env.*
+coverage/
+test-results/
+playwright-report/
+_site/
+dist/
+*.log
